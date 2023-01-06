@@ -2,48 +2,24 @@ connection: "obms-reporting-test"
 
 # include all the views
 include: "/views/**/*.view"
-include: "/**/state.dashboard"
-include: "/**/district.dashboard"
-include: "/**/district_comp.dashboard"
-include: "/**/district_map.dashboard"
-include: "/**/school.dashboard"
-include: "/**/school_comp.dashboard"
-include: "/**/school_map.dashboard"
-include: "/**/program.dashboard"
-include: "/**/recs.dashboard"
-include: "/**/annual_attendance_report.dashboard"
+include: "/dashboards/**/*.dashboard"
 
-datagroup: ped_public_financials_default_datagroup {
-  # sql_trigger: SELECT MAX(id) FROM etl_log;;
-  max_cache_age: "1 hour"
+datagroup: ped_public_financials_test_datagroup {
+  sql_trigger: SELECT max(modify_date) FROM sys.tables;;
+  max_cache_age: "24 hours"
 }
 
-persist_with: ped_public_financials_default_datagroup
+persist_with: ped_public_financials_test_datagroup
+
 explore: actuals_revenue_line {
-  sql_always_where: ${budget_year.start_year}>=2020 and ${coa_account_type.code}='R' and ${actuals_reporting_period.code}='YTD' and ${actuals_status.code}='AA'
-                    and ${entity_year.parent_type} not in ('Community-Based Organization', 'Post-Secondary Institution', 'State-Supported School', 'BIE Institution')
-                    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
+  sql_always_where: ${coa_account_type.code}='R'
+    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
   label: "Actual Revenue"
 
   join: actuals_budget_period {
     relationship: many_to_one
     type:  inner
     sql_on:  ${actuals_revenue_line.fk_actuals_budget_period}=${actuals_budget_period.pk_actuals_budget_period} ;;
-  }
-  join: actuals_reporting_period {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${actuals_budget_period.fk_actuals_reporting_period}=${actuals_reporting_period.pk_actuals_reporting_period} ;;
-  }
-  join: actuals_status {
-    relationship: many_to_one
-    type: inner
-    sql_on:  ${actuals_budget_period.fk_actuals_status}=${actuals_status.pk_actuals_status} ;;
-  }
-  join: budget {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${actuals_budget_period.fk_budget} = ${budget.pk_budget} ;;
   }
   join: coa_line {
     relationship: many_to_one
@@ -73,12 +49,12 @@ explore: actuals_revenue_line {
   join: budget_year {
     relationship: many_to_one
     type: left_outer
-    sql_on: ${budget.fk_budget_year}=${budget_year.pk_budget_year} ;;
+    sql_on: ${actuals_budget_period.fk_budget_year}=${budget_year.pk_budget_year} ;;
   }
   join: stars_locations {
     relationship: many_to_one
     type: left_outer
-    sql_on: ${entity_year.child_code}=${stars_locations.obms_code} and ${budget_year.year_name}=${stars_locations.location_year}  ;;
+    sql_on: ${entity_year.child_code}=${stars_locations.obms_code} and ${budget_year.year_name}=${stars_locations.location_year}  and ${entity_year.parent_type}!='Regional Education Cooperative';;
   }
   join: stars_districts {
     relationship: many_to_one
@@ -88,35 +64,19 @@ explore: actuals_revenue_line {
   join: rec_names {
     relationship: many_to_one
     type: left_outer
-    sql_on: ${entity_year.parent_code}=${rec_names.rec_code} and ${budget_year.year_name}=${rec_names.fiscal_year}  ;;
+    sql_on: ${entity_year.parent_code}=${rec_names.rec_code} and ${budget_year.year_name}=${rec_names.fiscal_year} and ${entity_year.parent_type}='Regional Education Cooperative' ;;
   }
 }
 
 explore: actuals_line {
-  sql_always_where: ${budget_year.start_year}>=2020 and ${coa_account_type.code}='E' and ${actuals_reporting_period.code}='YTD' and ${actuals_status.code}='AA'
-                    and ${entity_year.parent_type} not in ('Community-Based Organization', 'Post-Secondary Institution', 'State-Supported School', 'BIE Institution')
-                    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
+  sql_always_where: ${coa_account_type.code}='E'
+    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
   label: "Actual Expenditures"
 
   join: actuals_budget_period {
     relationship: many_to_one
     type:  inner
     sql_on:  ${actuals_line.fk_actuals_budget_period}=${actuals_budget_period.pk_actuals_budget_period} ;;
-  }
-  join: actuals_reporting_period {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${actuals_budget_period.fk_actuals_reporting_period}=${actuals_reporting_period.pk_actuals_reporting_period} ;;
-  }
-  join: actuals_status {
-    relationship: many_to_one
-    type: inner
-    sql_on:  ${actuals_budget_period.fk_actuals_status}=${actuals_status.pk_actuals_status} ;;
-  }
-  join: budget {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${actuals_budget_period.fk_budget} = ${budget.pk_budget} ;;
   }
   join: coa_line {
     relationship: many_to_one
@@ -161,7 +121,64 @@ explore: actuals_line {
   join: budget_year {
     relationship: many_to_one
     type: left_outer
-    sql_on: ${budget.fk_budget_year}=${budget_year.pk_budget_year} ;;
+    sql_on: ${actuals_budget_period.fk_budget_year}=${budget_year.pk_budget_year} ;;
+  }
+  join: stars_locations {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${entity_year.child_code}=${stars_locations.obms_code} and ${budget_year.year_name}=${stars_locations.location_year}  ;;
+  }
+  join: stars_districts {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${stars_locations.district_id}=${stars_districts.district_id} and ${stars_locations.location_year}=${stars_districts.location_year} ;;
+  }
+  join: rec_names {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${entity_year.parent_code}=${rec_names.rec_code} and ${budget_year.year_name}=${rec_names.fiscal_year}  ;;
+  }
+}
+
+explore: budget_revenue_line {
+  sql_always_where: ${coa_account_type.code}='R'
+    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
+  label: "Budgeted Revenue"
+
+  join: budget_fund {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${budget_revenue_line.fk_budget_fund}=${budget_fund.pk_budget_fund} ;;
+  }
+  join: coa_line {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${budget_revenue_line.fk_coaline}=${coa_line.pk_coaline} ;;
+  }
+  join: coa_account_type {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${coa_line.fk_coa_account_type}=${coa_account_type.pk_coa_account_type} ;;
+  }
+  join: coa_fund_hierarchy {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${coa_line.fk_coa_fund}=${coa_fund_hierarchy.pk_coa_fund} ;;
+  }
+  join: entity_year {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${budget_revenue_line.fk_location_year}=${entity_year.pk_entity_year};;
+  }
+  join: coa_object_hierarchy_revenue {
+    relationship: many_to_one
+    type:  left_outer
+    sql_on: ${coa_line.fk_coa_object}=${coa_object_hierarchy_revenue.pk_coa_object} ;;
+  }
+  join: budget_year {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${budget_fund.fk_budget_year}=${budget_year.pk_budget_year} ;;
   }
   join: stars_locations {
     relationship: many_to_one
@@ -181,97 +198,18 @@ explore: actuals_line {
 }
 
 explore: budget_line {
-  sql_always_where: ${budget_year.start_year}>=2020 and ${coa_account_type.code}='R' and ${budget_status.ordinal}>=12
-                    and ${entity_year.parent_type} not in ('Community-Based Organization', 'Post-Secondary Institution', 'State-Supported School', 'BIE Institution')
-                    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
-  label: "Budgeted Revenue"
-
+  sql_always_where: ${coa_account_type.code}='E'
+    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
+  label: "Budgeted Expenditures"
   join: budget_fund {
     relationship: many_to_one
     type: inner
     sql_on: ${budget_line.fk_budget_fund}=${budget_fund.pk_budget_fund} ;;
   }
-  join: budget {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${budget_fund.fk_budget}=${budget.pk_budget} ;;
-  }
-  join: budget_status {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${budget.fk_budget_status}=${budget_status.pk_budget_status} ;;
-  }
   join: coa_line {
     relationship: many_to_one
-    type: inner
+    type: left_outer
     sql_on: ${budget_line.fk_coaline}=${coa_line.pk_coaline} ;;
-  }
-  join: coa_account_type {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${coa_line.fk_coa_account_type}=${coa_account_type.pk_coa_account_type} ;;
-  }
-  join: coa_fund_hierarchy {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${coa_line.fk_coa_fund}=${coa_fund_hierarchy.pk_coa_fund} ;;
-  }
-  join: entity_year {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${budget_line.fk_location_year}=${entity_year.pk_entity_year};;
-  }
-  join: coa_object_hierarchy_revenue {
-    relationship: many_to_one
-    type:  left_outer
-    sql_on: ${coa_line.fk_coa_object}=${coa_object_hierarchy_revenue.pk_coa_object} ;;
-  }
-  join: budget_year {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${budget.fk_budget_year}=${budget_year.pk_budget_year} ;;
-  }
-  join: stars_locations {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${entity_year.child_code}=${stars_locations.obms_code} and ${budget_year.year_name}=${stars_locations.location_year}  ;;
-  }
-  join: stars_districts {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${stars_locations.district_id}=${stars_districts.district_id} and ${stars_locations.location_year}=${stars_districts.location_year} ;;
-  }
-  join: rec_names {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${entity_year.parent_code}=${rec_names.rec_code} and ${budget_year.year_name}=${rec_names.fiscal_year}  ;;
-  }
-}
-
-explore: budget_expenditures_line {
-  sql_always_where: ${budget_year.start_year}>=2020 and ${coa_account_type.code}='E' and ${budget_status.ordinal}>=12
-                    and ${entity_year.parent_type} not in ('Community-Based Organization', 'Post-Secondary Institution', 'State-Supported School', 'BIE Institution')
-                    and left(${coa_fund_hierarchy.fund_code}, 1)!='3' and left(${coa_fund_hierarchy.fund_code}, 1)!='4';;
-  label: "Budgeted Expenditures"
-  join: budget_fund {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${budget_expenditures_line.fk_budget_fund}=${budget_fund.pk_budget_fund} ;;
-  }
-  join: budget {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${budget_fund.fk_budget}=${budget.pk_budget} ;;
-  }
-  join: budget_status {
-    relationship: many_to_one
-    type: inner
-    sql_on: ${budget.fk_budget_status}=${budget_status.pk_budget_status} ;;
-  }
-  join: coa_line {
-    relationship: many_to_one
-    type: left_outer
-    sql_on: ${budget_expenditures_line.fk_coaline}=${coa_line.pk_coaline} ;;
   }
   join: coa_account_type {
     relationship: many_to_one
@@ -291,7 +229,7 @@ explore: budget_expenditures_line {
   join: entity_year {
     relationship: many_to_one
     type: left_outer
-    sql_on: ${budget_expenditures_line.fk_location_year}=${entity_year.pk_entity_year};;
+    sql_on: ${budget_line.fk_location_year}=${entity_year.pk_entity_year};;
   }
   join: coa_job_class {
     relationship: many_to_one
@@ -311,7 +249,7 @@ explore: budget_expenditures_line {
   join: budget_year {
     relationship: many_to_one
     type: left_outer
-    sql_on: ${budget.fk_budget_year}=${budget_year.pk_budget_year} ;;
+    sql_on: ${budget_fund.fk_budget_year}=${budget_year.pk_budget_year} ;;
   }
   join: stars_locations {
     relationship: many_to_one
@@ -334,7 +272,7 @@ explore: stars_locations {
   label: "School Data"
   join: stars_districts {
     relationship: many_to_one
-    type: left_outer
+    type: inner
     sql_on: ${stars_locations.district_id}=${stars_districts.district_id}
       and ${stars_locations.location_year}=${stars_districts.location_year};;
   }
@@ -343,6 +281,53 @@ explore: stars_locations {
     type:  left_outer
     sql_on: ${stars_districts.district_id}=${rec_member_districts.member_district_code} and ${stars_districts.location_year}=${rec_member_districts.fiscal_year};;
   }
+  join: budget_year {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${stars_locations.location_year}=${budget_year.year_name} ;;
+  }
+}
+
+explore: tribal_consultation {
+  join: budget_year {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${tribal_consultation.school_year}=${budget_year.year_name};;
+  }
+  join: stars_districts {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${stars_districts.location_year}=${tribal_consultation.school_year}
+      and ${stars_districts.district_id} = ${tribal_consultation.district_code};;
+  }
+  join: stars_locations {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${stars_locations.location_year} = ${tribal_consultation.school_year}
+       and ${stars_locations.location_code} = ${tribal_consultation.location_code}
+      and ${tribal_consultation.location_code}!='';;
+  }
+}
+
+explore: student_outcome_funding_narrative {
+  join: budget_year {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${student_outcome_funding_narrative.school_year}=${budget_year.year_name};;
+  }
+  join: stars_districts {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${stars_districts.location_year}=${student_outcome_funding_narrative.school_year}
+      and ${stars_districts.district_id} = ${student_outcome_funding_narrative.district_id};;
+  }
+  join: stars_locations {
+    relationship: many_to_one
+    type: inner
+    sql_on: ${stars_locations.location_year} = ${student_outcome_funding_narrative.school_year}
+      and ${stars_locations.location_code} = ${student_outcome_funding_narrative.location_code};;
+  }
+
 }
 
 explore: annual_attendance {}

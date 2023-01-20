@@ -4,7 +4,7 @@ view: student_outcome_funding_narrative {
   dimension: actual_revenue_amount {
     type: number
     hidden: no
-    value_format: "$#,##0"
+    value_format: "$#,##0.00"
     sql: ${TABLE}.actual_revenue_amount ;;
   }
 

@@ -1,4 +1,4 @@
-connection: "obms-reporting-test"
+connection: "obms-reporting"
 
 # include all the views
 include: "/views/**/*.view"

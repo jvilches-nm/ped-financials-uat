@@ -763,8 +763,7 @@
       to date for the selected school year not including capital or debt service funds
       divided by the number of district students based on the 40-day count for that
       school year. This average should be considered an estimate for comparison purposes
-      and not an actual tally of the spending per student. Charter students and expenditures
-      are not included in these calculations.
+      and not an actual tally of the spending per student.
     merged_queries:
     - model: ped_public_financials_uat
       explore: actuals_line

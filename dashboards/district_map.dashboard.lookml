@@ -95,7 +95,6 @@
     type: looker_map
     fields: [stars_districts.District_Custom_Map, actuals_line.amount, stars_districts.total_student_pop]
     filters:
-      budget_year.year_name: 2022-2023
       stars_districts.district_name: "-NULL"
       stars_districts.district_type: State District
       coa_fund_hierarchy.fund_group: "-Capital Outlay,-Debt Service"

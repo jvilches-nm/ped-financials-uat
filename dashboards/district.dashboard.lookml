@@ -493,9 +493,6 @@
     defaults_version: 1
     hidden_fields: [stars_locations.count]
     series_types: {}
-    note_state: expanded
-    note_display: hover
-    note_text: Not included in financial totals or averages.
     listen:
       District Type: stars_districts.district_type
       Fiscal Year: budget_year.year_name
@@ -774,9 +771,6 @@
     conditional_formatting_include_nulls: false
     single_value_title: Local Charter Students
     defaults_version: 1
-    note_state: collapsed
-    note_display: hover
-    note_text: Not included in student totals below or average spending calculations.
     listen:
       District Type: stars_districts.district_type
       Fiscal Year: budget_year.year_name
@@ -1237,7 +1231,7 @@
       capital or debt service funds divided by the number of district students based
       on the 40-day count for that school year. This average should be considered
       an estimate for comparison purposes and not an actual tally of the spending
-      per student. Charter students and expenditures are not included in these calculations.
+      per student.
     merged_queries:
     - model: ped_public_financials_uat
       explore: actuals_line
@@ -1288,8 +1282,7 @@
       school year not including capital or debt service funds divided by the number
       of district students based on the 40-day count for that school year. This average
       should be considered an estimate for comparison purposes and not an actual tally
-      of the spending per student. Charter students and expenditures are not included
-      in these calculations.
+      of the spending per student.
     merged_queries:
     - model: ped_public_financials_uat
       explore: actuals_line

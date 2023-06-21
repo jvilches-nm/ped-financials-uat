@@ -1798,7 +1798,7 @@
     series_types: {}
     note_state: collapsed
     note_display: hover
-    note_text: Does not include reserved or unreserved cash balances.
+    note_text: Does not include restricted or unrestricted cash balances.
     listen:
       Fiscal Year: budget_year.year_name
     row: 4

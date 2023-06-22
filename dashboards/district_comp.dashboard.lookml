@@ -1,4 +1,4 @@
-- dashboard: district_comparison_uat
+- dashboard: district_comp
   title: District Comparison UAT
   layout: newspaper
   preferred_viewer: dashboards-next
@@ -485,6 +485,9 @@
     series_colors:
       State and Local Grants - actuals_line.amount: "#F2C73C"
       General Fund - actuals_line.amount: "#A8876C"
+      Other - actuals_line.amount: "#9B2030"
+      Federal Grants - actuals_line.amount: "#068993"
+      Food Services - actuals_line.amount: "#F15922"
     x_axis_gridlines: false
     y_axis_gridlines: true
     show_view_names: false
@@ -705,7 +708,7 @@
     series_colors:
       Debt Service - actuals_revenue_line.amount: "#F15922"
       Federal Grants - actuals_revenue_line.amount: "#068993"
-      Food Services - actuals_revenue_line.amount: "#A85573"
+      Food Services - actuals_revenue_line.amount: "#F15922"
       General Fund - actuals_revenue_line.amount: "#A8876C"
       State and Local Grants - actuals_revenue_line.amount: "#F2C73C"
     x_axis_gridlines: false

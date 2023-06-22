@@ -1,9 +1,9 @@
-- dashboard: district_comp
+- dashboard: district_comparison_uat
   title: District Comparison UAT
   layout: newspaper
   preferred_viewer: dashboards-next
   description: ''
-  preferred_slug: qgjNwu57UNA3z3xnvNBHyU
+  preferred_slug: Eh89t7OcbY2S2fxiHzzQRp
   elements:
   - title: Actual Expenditures by Object Category for General Funds
     name: Actual Expenditures by Object Category for General Funds
@@ -778,7 +778,6 @@
       dynamic_fields: [{category: table_calculation, expression: "${actuals_line.amount}/${stars_districts.total_student_pop}",
           label: Avg total spend, value_format: !!null '', value_format_name: usd_0,
           _kind_hint: measure, table_calculation: avg_total_spend, _type_hint: number}]
-      hidden_pivots: {}
       join_fields: []
     - model: ped_public_financials_uat
       explore: actuals_line
@@ -794,7 +793,6 @@
       dynamic_fields: [{category: table_calculation, expression: "${actuals_line.amount}/${stars_districts.total_student_pop}",
           label: Avg instructional spend, value_format: !!null '', value_format_name: usd_0,
           _kind_hint: measure, table_calculation: avg_instructional_spend, _type_hint: number}]
-      hidden_pivots: {}
       join_fields:
       - field_name: stars_districts.district_name
         source_field_name: stars_districts.district_name
@@ -1034,6 +1032,7 @@
     listen:
       District Type: stars_districts.district_type
       Fiscal Year: budget_year.year_name
+      'Select up to 4 districts:': stars_districts.district_name
     row: 13
     col: 0
     width: 11
@@ -1045,7 +1044,6 @@
     type: looker_donut_multiples
     fields: [actuals_line.amount, coa_function_hierarchy.rollup_function_name, stars_districts.district_name]
     pivots: [coa_function_hierarchy.rollup_function_name]
-    filters: {}
     sorts: [coa_function_hierarchy.rollup_function_name, stars_districts.district_name]
     limit: 4
     column_limit: 50
@@ -1153,7 +1151,6 @@
   - name: ''
     type: text
     title_text: ''
-    subtitle_text: ''
     body_text: '[{"type":"h1","children":[{"text":"District Comparison Overview"}],"align":"center"},{"type":"h3","align":"left","children":[{"text":"Overview
       of district education finances in comparison - includes all district and local
       charter students, all district and local charter schools. To learn more about

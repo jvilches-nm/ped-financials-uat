@@ -2,7 +2,7 @@ view: actuals_budget_period {
   derived_table: {
     sql: select * from (SELECT abp.pkactualsbudgetperiod, fkbudget, b.name budget_name, fkbudgetyear, abp.ActualsReportingPeriodCode reporting_period_code, abp.ActualsReportingPeriodDescription reporting_period_description ,
                 LastApproved = ROW_NUMBER() OVER (PARTITION BY abp.fkBudget
-                                                    ORDER BY arp.Ordinal DESC)
+                                                    ORDER BY abp.ActualsReportingPeriodOrdinal DESC)
          FROM   Actuals.ActualsBudgetPeriod abp
                 INNER JOIN
                 Actuals.ActualsStatus astat
